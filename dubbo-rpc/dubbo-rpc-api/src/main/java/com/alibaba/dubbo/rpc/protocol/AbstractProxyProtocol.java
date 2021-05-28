@@ -60,14 +60,17 @@ public abstract class AbstractProxyProtocol extends AbstractProtocol {
         this.proxyFactory = proxyFactory;
     }
 
+    // 导出服务
     @Override
     @SuppressWarnings("unchecked")
     public <T> Exporter<T> export(final Invoker<T> invoker) throws RpcException {
+        // 从父类中找该invoker是否已经创建了export，如果创建了直接返回
         final String uri = serviceKey(invoker.getUrl());
         Exporter<T> exporter = (Exporter<T>) exporterMap.get(uri);
         if (exporter != null) {
             return exporter;
         }
+        // 执行具体export逻辑，然后创建export对象缓存起来，然后返回
         final Runnable runnable = doExport(proxyFactory.getProxy(invoker, true), invoker.getInterface(), invoker.getUrl());
         exporter = new AbstractExporter<T>(invoker) {
             @Override
@@ -76,6 +79,7 @@ public abstract class AbstractProxyProtocol extends AbstractProtocol {
                 exporterMap.remove(uri);
                 if (runnable != null) {
                     try {
+                        // 在unexport的时候为啥要执行一下export的逻辑？答：doExport返回的Runnable是取消暴露的逻辑
                         runnable.run();
                     } catch (Throwable t) {
                         logger.warn(t.getMessage(), t);
@@ -87,9 +91,14 @@ public abstract class AbstractProxyProtocol extends AbstractProtocol {
         return exporter;
     }
 
+    // 引用服务
     @Override
     public <T> Invoker<T> refer(final Class<T> type, final URL url) throws RpcException {
-        final Invoker<T> target = proxyFactory.getInvoker(doRefer(type, url), type, url);
+        final Invoker<T> target = proxyFactory.getInvoker(
+                doRefer(type, url), // 找到代理类
+                type,
+                url
+        );
         Invoker<T> invoker = new AbstractInvoker<T>(type, url) {
             @Override
             protected Result doInvoke(Invocation invocation) throws Throwable {
@@ -137,8 +146,10 @@ public abstract class AbstractProxyProtocol extends AbstractProtocol {
         return RpcException.UNKNOWN_EXCEPTION;
     }
 
+    // 我擦，返回的runnable是取消暴露的逻辑，骚操作
     protected abstract <T> Runnable doExport(T impl, Class<T> type, URL url) throws RpcException;
 
+    // 找type对应的代理类
     protected abstract <T> T doRefer(Class<T> type, URL url) throws RpcException;
 
 }

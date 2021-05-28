@@ -37,7 +37,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public abstract class AbstractProtocol implements Protocol {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
-
+    // 缓存URL->Export。 一个协议可以有多个export，每个export对应一个接口
     protected final Map<String, Exporter<?>> exporterMap = new ConcurrentHashMap<String, Exporter<?>>();
 
     //TODO SOFEREFENCE

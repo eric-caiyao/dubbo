@@ -43,9 +43,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public abstract class AbstractInvoker<T> implements Invoker<T> {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
-
+    // 缓存类型
     private final Class<T> type;
-
+    // 缓存配置
     private final URL url;
 
     private final Map<String, String> attachment;
