@@ -62,6 +62,7 @@ public class StubProxyFactoryWrapper implements ProxyFactory {
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     public <T> T getProxy(Invoker<T> invoker) throws RpcException {
+        // 如果url指定了stub_key或者local_key，则给当前proxy包装进Wrapper，实例化*Stub或者*Local，然后导出Stub或者Local
         T proxy = proxyFactory.getProxy(invoker);
         if (GenericService.class != invoker.getInterface()) {
             String stub = invoker.getUrl().getParameter(Constants.STUB_KEY, invoker.getUrl().getParameter(Constants.LOCAL_KEY));
@@ -88,6 +89,7 @@ public class StubProxyFactoryWrapper implements ProxyFactory {
                             url = url.addParameter(Constants.STUB_EVENT_METHODS_KEY, StringUtils.join(Wrapper.getWrapper(proxy.getClass()).getDeclaredMethodNames(), ","));
                             url = url.addParameter(Constants.IS_SERVER_KEY, Boolean.FALSE.toString());
                             try {
+                                // 这里是消费invoker对应的服务，这里给封装的proxy再次导出是啥意思？
                                 export(proxy, (Class) invoker.getInterface(), url);
                             } catch (Exception e) {
                                 LOGGER.error("export a stub service error.", e);

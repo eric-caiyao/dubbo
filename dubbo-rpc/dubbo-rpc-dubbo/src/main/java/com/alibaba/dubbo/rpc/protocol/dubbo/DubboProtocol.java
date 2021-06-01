@@ -159,10 +159,12 @@ public class DubboProtocol extends AbstractProtocol {
     };
 
     public DubboProtocol() {
+        // 单例
         INSTANCE = this;
     }
 
     public static DubboProtocol getDubboProtocol() {
+        // 获取单例dubboprotocol
         if (INSTANCE == null) {
             ExtensionLoader.getExtensionLoader(Protocol.class).getExtension(DubboProtocol.NAME); // load
         }
