@@ -99,17 +99,17 @@ public abstract class AbstractServer extends AbstractEndpoint implements Remotin
         executorRepository.updateThreadpool(url, executor);
         super.setUrl(getUrl().addParameters(url.getParameters()));
     }
-
     @Override
     public void send(Object message, boolean sent) throws RemotingException {
         Collection<Channel> channels = getChannels();
         for (Channel channel : channels) {
             if (channel.isConnected()) {
                 channel.send(message, sent);
+                // 这里是不是待执行下sent方法？ 否则消息发送到通道了怎么通知channelHandler？
+                // super.sent(channel,message);
             }
         }
     }
-
     @Override
     public void close() {
         if (logger.isInfoEnabled()) {

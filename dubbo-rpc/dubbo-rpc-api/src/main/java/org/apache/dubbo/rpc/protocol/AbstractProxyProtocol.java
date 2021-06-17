@@ -75,6 +75,9 @@ public abstract class AbstractProxyProtocol extends AbstractProtocol {
 
     @Override
     @SuppressWarnings("unchecked")
+    /**
+     * invoker转成impl给子类export用
+     */
     public <T> Exporter<T> export(final Invoker<T> invoker) throws RpcException {
         final String uri = serviceKey(invoker.getUrl());
         Exporter<T> exporter = (Exporter<T>) exporterMap.get(uri);
@@ -103,6 +106,9 @@ public abstract class AbstractProxyProtocol extends AbstractProtocol {
     }
 
     @Override
+    /**
+     * class&url转成
+     */
     protected <T> Invoker<T> protocolBindingRefer(final Class<T> type, final URL url) throws RpcException {
         final Invoker<T> target = proxyFactory.getInvoker(doRefer(type, url), type, url);
         Invoker<T> invoker = new AbstractInvoker<T>(type, url) {

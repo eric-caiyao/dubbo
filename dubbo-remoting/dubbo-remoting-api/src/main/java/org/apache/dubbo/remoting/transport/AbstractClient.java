@@ -179,6 +179,8 @@ public abstract class AbstractClient extends AbstractEndpoint implements Client 
             throw new RemotingException(this, "message can not send, because channel is closed . url:" + getUrl());
         }
         channel.send(message, sent);
+        // 这里为什么不调用sent方法通知channelhandler？
+        // super.sent(channel,message);
     }
 
     protected void connect() throws RemotingException {
@@ -196,7 +198,8 @@ public abstract class AbstractClient extends AbstractEndpoint implements Client 
             }
 
             doConnect();
-
+            // 这里为什么不调用 connected方法？
+            // super.connected(getChannel());
             if (!isConnected()) {
                 throw new RemotingException(this, "Failed connect to server " + getRemoteAddress() + " from " + getClass().getSimpleName() + " "
                                 + NetUtils.getLocalHost() + " using dubbo version " + Version.getVersion()
